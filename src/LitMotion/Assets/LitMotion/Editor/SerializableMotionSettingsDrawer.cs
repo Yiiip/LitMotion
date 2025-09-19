@@ -53,7 +53,7 @@ namespace LitMotion.Editor
                     AddPropertyField(group, property, "endValue");
                 }
 
-                AddPropertyField(group, property, "duration");
+                AddPropertyField(group, property, "duration", "Duration (s)");
             });
 
             Group(foldout, group =>
@@ -82,13 +82,13 @@ namespace LitMotion.Editor
 
             Group(foldout, group =>
             {
-                AddPropertyField(group, property, "delay");
+                AddPropertyField(group, property, "delay", "Delay (s)");
                 AddPropertyField(group, property, "delayType");
             });
 
             Group(foldout, group =>
             {
-                AddPropertyField(group, property, "loops");
+                AddPropertyField(group, property, "loops", onValueChanged: OnLoopsPropertyValueChanged);
                 AddPropertyField(group, property, "loopType");
             });
 
@@ -136,9 +136,21 @@ namespace LitMotion.Editor
             root.Add(group);
         }
 
-        void AddPropertyField(VisualElement root, SerializedProperty property, string name)
+        //修改了源码，支持了更多可选参数
+        void AddPropertyField(VisualElement root, SerializedProperty property, string name, string label = null, EventCallback<SerializedPropertyChangeEvent> onValueChanged = null)
         {
-            root.Add(new PropertyField(property.FindPropertyRelative(name)));
+            var propertyField = new PropertyField(property.FindPropertyRelative(name), label);
+            propertyField.RegisterValueChangeCallback(onValueChanged);
+            root.Add(propertyField);
+        }
+
+        void OnLoopsPropertyValueChanged(SerializedPropertyChangeEvent evt)
+        {
+            if (evt.changedProperty.intValue < -1)
+            {
+                evt.changedProperty.intValue = -1;
+                evt.changedProperty.serializedObject.ApplyModifiedProperties();
+            }
         }
 
         IEnumerable<SerializedProperty> GetChildren(SerializedProperty property)

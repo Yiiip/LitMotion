@@ -277,6 +277,19 @@ namespace LitMotion
         }
 
         /// <summary>
+        /// 用于指定是否忽略时间缩放
+        /// </summary>
+        /// <remarks>修改了源码，新增此方法</remarks>
+        /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public readonly MotionBuilder<TValue, TOptions, TAdapter> WithIgnoreTimeScale()
+        {
+            CheckBuffer();
+            buffer.Scheduler = MotionScheduler.UpdateIgnoreTimeScale;
+            return this;
+        }
+
+        /// <summary>
         /// Specifies the name that will be displayed in the debugger.
         /// </summary>
         /// <param name="debugName">Debug name</param>

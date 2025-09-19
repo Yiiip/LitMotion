@@ -33,6 +33,8 @@ namespace LitMotion.Animation.Editor
                 serializedObject.ApplyModifiedProperties();
             };
 
+            root.Add(new PropertyField(serializedObject.FindProperty("notes"), "备注")); //修改了源码，新增备注信息
+
             root.Add(CreateSettingsPanel());
             componentRoot.Add(CreateComponentsPanel());
             root.Add(componentRoot);

@@ -109,6 +109,6 @@ namespace LitMotion
         [SerializeField] bool skipValuesDuringDelay;
         [SerializeField] bool immediateBind;
 
-        internal IMotionScheduler scheduler;
+        internal IMotionScheduler scheduler = MotionScheduler.UpdateIgnoreTimeScale; //修改了源码的默认值
     }
 }

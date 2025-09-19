@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using LitMotion.Collections;
 using UnityEngine;
 
@@ -14,7 +15,8 @@ namespace LitMotion.Animation
             Sequential
         }
 
-        [SerializeField] bool playOnAwake = true;
+        public string notes; //修改了源码，新增备注字段
+        [SerializeField] bool playOnAwake = false; //修改了源码的默认值
         [SerializeField] AnimationMode animationMode;
 
         [SerializeReference]
@@ -148,10 +150,41 @@ namespace LitMotion.Animation
             queue.Clear();
         }
 
+        public void Cancel() //修改了源码，新增方法
+        {
+            var span = playingComponents.AsSpan();
+            span.Reverse();
+            foreach (var component in span)
+            {
+                var handle = component.TrackedHandle;
+                handle.TryCancel();
+                //不走OnStop()
+                component.TrackedHandle = handle;
+            }
+
+            playingComponents.Clear();
+            queue.Clear();
+        }
+
         public void Restart()
         {
             Stop();
             Play();
+        }
+
+        private System.Threading.CancellationTokenSource _cancelPlayAsync;
+        public async UniTask PlayAsync(Action onShowEnd = null) //修改了源码，新增方法
+        {
+            if (_cancelPlayAsync != null)
+            {
+                _cancelPlayAsync.Cancel();
+                _cancelPlayAsync.Dispose();
+            }
+            _cancelPlayAsync = new();
+            Cancel();
+            Play();
+            await UniTask.WaitUntil(() => !IsPlaying, cancellationToken: _cancelPlayAsync.Token);
+            onShowEnd?.Invoke();
         }
 
         public bool IsActive
@@ -188,6 +221,11 @@ namespace LitMotion.Animation
 
         void OnDestroy()
         {
+            if (_cancelPlayAsync != null)
+            {
+                _cancelPlayAsync.Cancel();
+                _cancelPlayAsync.Dispose();
+            }
             Stop();
         }
     }

@@ -16,16 +16,25 @@ namespace LitMotion.Animation
         [SerializeField] bool relative;
 
         TValue startValue;
+        bool hasStartValue; //修改了源码，新增hasStartValue字段
 
         public override void OnStop()
         {
-            if (target == null) return;
-            SetValue(target, startValue);
+            // 修改了源码，注掉
+            // if (target == null) return;
+            // SetValue(target, startValue);
         }
 
         public override MotionHandle Play()
         {
-            startValue = GetValue(target);
+            // 修改了源码，注掉并更改
+            // startValue = GetValue(target);
+            if (!hasStartValue)
+            {
+                hasStartValue = true;
+                startValue = GetValue(target);
+            }
+            SetValue(target, settings.StartValue); //0帧起手
 
             MotionHandle handle;
 
