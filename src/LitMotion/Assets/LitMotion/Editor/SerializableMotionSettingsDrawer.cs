@@ -21,6 +21,11 @@ namespace LitMotion.Editor
 
             Group(foldout, group =>
             {
+                AddPropertyField(group, property, "dynamicStartValue", "Dynamic Start Value", "如果启用，则StartValue为当前值；否则为用户设定的值", onValueChanged: e =>
+                {
+                    group.Q("startValue").enabledSelf = !property.FindPropertyRelative("dynamicStartValue").boolValue;
+                });
+
                 var valueType = fieldInfo.FieldType.GenericTypeArguments[0];
                 if (valueType == typeof(FixedString32Bytes))
                 {
@@ -52,6 +57,7 @@ namespace LitMotion.Editor
                     AddPropertyField(group, property, "startValue");
                     AddPropertyField(group, property, "endValue");
                 }
+                group.Q("startValue").enabledSelf = !property.FindPropertyRelative("dynamicStartValue").boolValue;
 
                 AddPropertyField(group, property, "duration", "Duration (s)");
             });
@@ -137,9 +143,14 @@ namespace LitMotion.Editor
         }
 
         //修改了源码，支持了更多可选参数
-        void AddPropertyField(VisualElement root, SerializedProperty property, string name, string label = null, EventCallback<SerializedPropertyChangeEvent> onValueChanged = null)
+        void AddPropertyField(VisualElement root, SerializedProperty property, string name, string label = null, string tooltip = null, EventCallback<SerializedPropertyChangeEvent> onValueChanged = null)
         {
             var propertyField = new PropertyField(property.FindPropertyRelative(name), label);
+            propertyField.name = name;
+            if (!string.IsNullOrEmpty(tooltip))
+            {
+                propertyField.tooltip = tooltip;
+            }
             propertyField.RegisterValueChangeCallback(onValueChanged);
             root.Add(propertyField);
         }

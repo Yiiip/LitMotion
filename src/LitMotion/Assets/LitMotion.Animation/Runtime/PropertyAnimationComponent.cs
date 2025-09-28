@@ -16,7 +16,7 @@ namespace LitMotion.Animation
         [SerializeField] bool relative;
 
         TValue startValue;
-        bool hasStartValue; //修改了源码，新增hasStartValue字段
+        bool isStartValueInit; //修改了源码，新增该字段
 
         public override void OnStop()
         {
@@ -29,12 +29,19 @@ namespace LitMotion.Animation
         {
             // 修改了源码，注掉并更改
             // startValue = GetValue(target);
-            if (!hasStartValue)
+            if (settings.DynamicStartValue)
             {
-                hasStartValue = true;
                 startValue = GetValue(target);
             }
-            SetValue(target, settings.StartValue); //0帧起手
+            else
+            {
+                if (!isStartValueInit)
+                {
+                    isStartValueInit = true;
+                    startValue = settings.StartValue;
+                }
+            }
+            SetValue(target, startValue); //0帧起手
 
             MotionHandle handle;
 

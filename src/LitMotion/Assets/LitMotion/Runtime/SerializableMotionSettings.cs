@@ -47,6 +47,16 @@ namespace LitMotion
         [SerializeField] bool additionalSettings;
 #endif
 
+        [SerializeField] bool dynamicStartValue; //修改了源码，新增该字段
+        /// <summary>
+        /// 动画开始值是否动态设定为当前值。如果为true，则动画开始值设定为当前值；否则为用户设定的值。
+        /// </summary>
+        public bool DynamicStartValue
+        {
+            get => dynamicStartValue;
+            init => dynamicStartValue = value;
+        }
+
         public void OnBeforeSerialize()
         {
             SetScheduler(Scheduler);

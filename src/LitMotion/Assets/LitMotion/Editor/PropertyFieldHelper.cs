@@ -36,6 +36,7 @@ namespace LitMotion.Editor
             });
 
             textField.AddToClassList("unity-base-field__aligned");
+            textField.name = property.name;
 
             return textField;
         }
