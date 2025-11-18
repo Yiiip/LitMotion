@@ -9,11 +9,26 @@ namespace LitMotion.Animation.Components
     public sealed class DelayComponent : LitMotionAnimationComponent
     {
         [SerializeField] float delay;
+        [SerializeField] bool ignoreTimeScale = true; //新增字段，是否忽略时间缩放
+        public float Delay
+        {
+            get => delay;
+            set => delay = value;
+        }
+        public bool IgnoreTimeScale
+        {
+            get => ignoreTimeScale;
+            set => ignoreTimeScale = value;
+        }
 
         public override MotionHandle Play()
         {
-            return LMotion.Create(0f, 1f, delay)
-                .RunWithoutBinding();
+            var builder = LMotion.Create(0f, 1f, delay);
+            if (ignoreTimeScale)
+            {
+                builder.WithIgnoreTimeScale();
+            }
+            return builder.RunWithoutBinding();
         }
 
         public override void OnStop() { }
