@@ -29,19 +29,23 @@ namespace LitMotion.Animation
         {
             // 修改了源码，注掉并更改
             // startValue = GetValue(target);
-            if (settings.DynamicStartValue)
+            if (settings.DynamicStartValue) //自动设定
             {
                 startValue = GetValue(target);
+                if (!relative)
+                {
+                    settings.StartValue = startValue;
+                }
             }
-            else
+            else //用户设定
             {
                 if (!isStartValueInit)
                 {
                     isStartValueInit = true;
-                    startValue = settings.StartValue;
+                    startValue = relative ? GetValue(target) : settings.StartValue;
                 }
             }
-            SetValue(target, startValue); //0帧起手
+            SetValue(target, relative ? GetRelativeValue(startValue, settings.StartValue) : settings.StartValue); //0帧起手
 
             MotionHandle handle;
 

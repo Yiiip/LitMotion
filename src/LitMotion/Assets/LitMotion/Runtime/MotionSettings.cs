@@ -14,7 +14,7 @@ namespace LitMotion
         public TValue StartValue
         {
             get => startValue;
-            init => startValue = value;
+            internal set => startValue = value;
         }
 
         public TValue EndValue

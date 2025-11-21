@@ -253,6 +253,11 @@ namespace LitMotion.Animation.Editor
             componentRoot.Add(CreateComponentsPanel());
         }
 
+        /// <summary>
+        /// 创建LitMotionAnimationComponent组件GUI
+        /// </summary>
+        /// <param name="property">LitMotionAnimationComponent组件</param>
+        /// <returns></returns>
         AnimationComponentView CreateComponentGUI(SerializedProperty property)
         {
             var view = new AnimationComponentView();
@@ -283,6 +288,7 @@ namespace LitMotion.Animation.Editor
 
                 view.Foldout.BindProperty(property);
 
+                //遍历LitMotionAnimationComponent的序列化字段
                 var endProperty = property.GetEndProperty();
                 var isFirst = true;
                 while (property.NextVisible(isFirst))

@@ -19,11 +19,15 @@ namespace LitMotion.Editor
 
             foldout.BindProperty(property);
 
+            var lastRelativeMoveValue = TryGetRelativeModeValue(property);
+
             Group(foldout, group =>
             {
+                var isRelativeMode = TryGetRelativeModeValue(property);
+
                 AddPropertyField(group, property, "dynamicStartValue", "Dynamic Start Value", "如果启用，则StartValue为当前值；否则为用户设定的值", onValueChanged: e =>
                 {
-                    group.Q("startValue").enabledSelf = !property.FindPropertyRelative("dynamicStartValue").boolValue;
+                    RefreshStartValueState(group, property);
                 });
 
                 var valueType = fieldInfo.FieldType.GenericTypeArguments[0];
@@ -57,9 +61,19 @@ namespace LitMotion.Editor
                     AddPropertyField(group, property, "startValue");
                     AddPropertyField(group, property, "endValue");
                 }
-                group.Q("startValue").enabledSelf = !property.FindPropertyRelative("dynamicStartValue").boolValue;
 
                 AddPropertyField(group, property, "duration", "Duration (s)");
+
+                // 定期检查relative值的状态变化
+                group.schedule.Execute(() =>
+                {
+                    var currRelativeModeValue = TryGetRelativeModeValue(property);
+                    if (currRelativeModeValue != lastRelativeMoveValue)
+                    {
+                        RefreshStartValueState(group, property);
+                        lastRelativeMoveValue = currRelativeModeValue;
+                    }
+                }).Every(500);
             });
 
             Group(foldout, group =>
@@ -179,6 +193,29 @@ namespace LitMotion.Editor
                 }
                 while (currentProperty.Next(false));
             }
+        }
+
+        private bool TryGetRelativeModeValue(SerializedProperty property)
+        {
+            //找到LitMotionAnimationComponent中的是否有relative字段,如果有,则返回其值
+            try
+            {
+                var propertyPath = property.propertyPath;
+                var relativePath = propertyPath.Replace(".settings", ".relative");
+                var relativeProperty = property.serializedObject.FindProperty(relativePath);
+
+                return relativeProperty != null && relativeProperty.boolValue;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        private void RefreshStartValueState(VisualElement v, SerializedProperty property)
+        {
+            bool isRelativeMode = TryGetRelativeModeValue(property);
+            bool dynamicStartValue = property.FindPropertyRelative("dynamicStartValue")?.boolValue ?? false;
+            v.Q("startValue")?.SetEnabled(isRelativeMode || !dynamicStartValue);
         }
     }
 }
