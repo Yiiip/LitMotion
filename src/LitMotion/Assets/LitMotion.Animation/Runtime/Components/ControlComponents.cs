@@ -67,7 +67,11 @@ namespace LitMotion.Animation.Components
                 .Bind(this, (x, state) =>
                 {
                     if (target == null) TrackedHandle.TryComplete();
-                    if (!target.IsPlaying) TrackedHandle.TryComplete();
+                    if (!target.IsPlaying)
+                    {
+                        TrackedHandle.TryComplete();
+                        target.Cancel(); //新增代码
+                    }
                 });
         }
 
